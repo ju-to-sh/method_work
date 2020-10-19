@@ -1,23 +1,30 @@
-puts <<~TEXT
-       旅行プランを選択してください
-       1. 沖縄旅行(¥10,000)
-       2. 北海道旅行(¥20,000)
-       3. 九州旅行(¥15,000)
-     TEXT
+require "csv"
 
-input_plan_number = gets.to_i
+def travel_plan
+  CSV.read("travel_plan.csv", headers: true).map do |row|
+    { place: row["place"], price: row["price"] }
+  end
+end
 
-puts "プランを選択 > #{input_plan_number}"
+def disp_plan
+  puts <<~TEXT
+         旅行プランを選択してください
+         1. 沖縄旅行(¥10,000)
+         2. 北海道旅行(¥20,000)
+         3. 九州旅行(¥15,000)
+       TEXT
+  print "プランを選択 > "
+end
 
-def disp_plan(plan_number)
-  plans = { okinawa: "沖縄旅行", hokkaido: "北海道旅行", kyuushuu: "九州旅行" }
+def disp_choice_plan(plan_number)
+  plan = travel_plan
   case plan_number
   when 1
-    plan_name = plans[:okinawa]
+    plan_name = plan[0][:place]
   when 2
-    plan_name = plans[:hokkaido]
+    plan_name = plan[1][:place]
   when 3
-    plan_name = plans[:kyuushuu]
+    plan_name = plan[2][:place]
   else
     puts "1~3の数値を入力してください"
     exit
@@ -25,18 +32,15 @@ def disp_plan(plan_number)
   puts "#{plan_name}ですね、何人で行きますか？"
 end
 
-disp_plan(input_plan_number)
-
-input_member = gets.to_i
-
 def total_price(plan_number, number_of_people)
+  plan = travel_plan
   case plan_number
   when 1
-    total_price = number_of_people * 10000
+    total_price = number_of_people * plan[0][:price].to_i
   when 2
-    total_price = number_of_people * 20000
+    total_price = number_of_people * plan[1][:price].to_i
   when 3
-    total_price = number_of_people * 15000
+    total_price = number_of_people * plan[2][:price].to_i
   end
 
   number_of_people >= 5 ? (total_price * 0.9).to_i : total_price
@@ -47,5 +51,9 @@ def disp_total_price(price, number_of_people)
   puts "合計料金：#{price}"
 end
 
-total_price = total_price(input_plan_number, input_member)
-disp_total_price(total_price, input_member)
+disp_plan
+plan_number = gets.to_i
+disp_choice_plan(plan_number)
+number_of_people = gets.to_i
+total_price = total_price(plan_number, number_of_people)
+disp_total_price(total_price, number_of_people)
