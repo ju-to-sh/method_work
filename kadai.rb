@@ -1,9 +1,10 @@
 require "csv"
 
-def travel_plan
-  CSV.read("travel_plan.csv", headers: true).map do |row|
+def travel_plan(place)
+  list = CSV.read("travel_plan.csv", headers: true).map do |row|
     { place: row["place"], price: row["price"] }
   end
+  list.find { |data| data[:place] == place }
 end
 
 def disp_plan
@@ -17,14 +18,13 @@ def disp_plan
 end
 
 def disp_choice_plan(plan_number)
-  plan = travel_plan
   case plan_number
   when 1
-    plan_name = plan[0][:place]
+    plan_name = travel_plan("沖縄")[:place]
   when 2
-    plan_name = plan[1][:place]
+    plan_name = travel_plan("北海道")[:place]
   when 3
-    plan_name = plan[2][:place]
+    plan_name = travel_plan("九州")[:place]
   else
     puts "1~3の数値を入力してください"
     exit
@@ -33,14 +33,13 @@ def disp_choice_plan(plan_number)
 end
 
 def total_price(plan_number, number_of_people)
-  plan = travel_plan
   case plan_number
   when 1
-    total_price = number_of_people * plan[0][:price].to_i
+    total_price = number_of_people * travel_plan("沖縄")[:price].to_i
   when 2
-    total_price = number_of_people * plan[1][:price].to_i
+    total_price = number_of_people * travel_plan("北海道")[:price].to_i
   when 3
-    total_price = number_of_people * plan[2][:price].to_i
+    total_price = number_of_people * travel_plan("九州")[:price].to_i
   end
 
   number_of_people >= 5 ? (total_price * 0.9).to_i : total_price
