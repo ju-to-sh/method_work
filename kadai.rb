@@ -1,47 +1,32 @@
 require "csv"
 
-def travel_plan(place)
-  list = CSV.read("travel_plan.csv", headers: true).map do |row|
-    { place: row["place"], price: row["price"] }
-  end
-  list.find { |data| data[:place] == place }
+plans = CSV.read("travel_plan.csv", headers: true).map do |row|
+  { id: row["id"], place: row["place"], price: row["price"] }
 end
 
-def disp_plan
-  puts <<~TEXT
-         旅行プランを選択してください
-         1. 沖縄旅行(¥10,000)
-         2. 北海道旅行(¥20,000)
-         3. 九州旅行(¥15,000)
-       TEXT
+def disp_plan(plans)
+  puts "旅行プランを選択してください"
+  plans.each do |plan|
+    puts "#{plan[:id]}. #{plan[:place]}旅行(¥#{plan[:price]})"
+  end
   print "プランを選択 > "
 end
 
-def disp_choice_plan(plan_number)
-  case plan_number
-  when 1
-    plan_name = travel_plan("沖縄")[:place]
-  when 2
-    plan_name = travel_plan("北海道")[:place]
-  when 3
-    plan_name = travel_plan("九州")[:place]
-  else
-    puts "1~3の数値を入力してください"
-    exit
+def disp_choice_plan(plan_number, plans)
+  while plan_number > plans.size || plan_number <= 0
+    puts "1〜#{plans.size}の間で入力し直してください"
+    plan_number = gets.to_i
   end
+  plan_name = plans[plan_number - 1][:place]
   puts "#{plan_name}ですね、何人で行きますか？"
 end
 
-def total_price(plan_number, number_of_people)
-  case plan_number
-  when 1
-    total_price = number_of_people * travel_plan("沖縄")[:price].to_i
-  when 2
-    total_price = number_of_people * travel_plan("北海道")[:price].to_i
-  when 3
-    total_price = number_of_people * travel_plan("九州")[:price].to_i
+def total_price(plan_number, plans, number_of_people)
+  while number_of_people <= 0
+    puts "人数は0人以上にして下さい"
+    number_of_people = gets.to_i
   end
-
+  total_price = number_of_people * plans[plan_number - 1][:price].to_i
   number_of_people >= 5 ? (total_price * 0.9).to_i : total_price
 end
 
@@ -50,9 +35,9 @@ def disp_total_price(price, number_of_people)
   puts "合計料金：#{price}"
 end
 
-disp_plan
+disp_plan(plans)
 plan_number = gets.to_i
-disp_choice_plan(plan_number)
+disp_choice_plan(plan_number, plans)
 number_of_people = gets.to_i
-total_price = total_price(plan_number, number_of_people)
+total_price = total_price(plan_number, plans, number_of_people)
 disp_total_price(total_price, number_of_people)
