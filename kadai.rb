@@ -1,4 +1,5 @@
 require "csv"
+require "pry"
 
 plans = CSV.read("travel_plan.csv", headers: true).map do |row|
   { id: row["id"], place: row["place"], price: row["price"] }
@@ -19,14 +20,19 @@ def disp_choice_plan(plan_number, plans)
   end
   plan_name = plans[plan_number - 1][:place]
   puts "#{plan_name}ですね、何人で行きますか？"
+  plans[plan_number - 1]
 end
 
-def total_price(plan_number, plans, number_of_people)
+def member(number_of_people)
   while number_of_people <= 0
     puts "人数は0人以上にして下さい"
     number_of_people = gets.to_i
   end
-  total_price = number_of_people * plans[plan_number - 1][:price].to_i
+  number_of_people
+end
+
+def total_price(choice_plan, number_of_people)
+  total_price = number_of_people * choice_plan[:price].to_i
   number_of_people >= 5 ? (total_price * 0.9).to_i : total_price
 end
 
@@ -37,7 +43,8 @@ end
 
 disp_plan(plans)
 plan_number = gets.to_i
-disp_choice_plan(plan_number, plans)
+choice_plan = disp_choice_plan(plan_number, plans)
 number_of_people = gets.to_i
-total_price = total_price(plan_number, plans, number_of_people)
-disp_total_price(total_price, number_of_people)
+input_member = member(number_of_people)
+total_price = total_price(choice_plan, input_member)
+disp_total_price(total_price, input_member)
