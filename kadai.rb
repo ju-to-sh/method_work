@@ -1,5 +1,4 @@
 require "csv"
-require "pry"
 
 plans = CSV.read("travel_plan.csv", headers: true).map do |row|
   { id: row["id"], place: row["place"], price: row["price"] }
@@ -18,9 +17,9 @@ def disp_choice_plan(plan_number, plans)
     puts "1〜#{plans.size}の間で入力し直してください"
     plan_number = gets.to_i
   end
-  plan_name = plans[plan_number - 1][:place]
-  puts "#{plan_name}ですね、何人で行きますか？"
-  plans[plan_number - 1]
+  plan = plans.find { |plan| plan[:id].to_i == plan_number }
+  puts "#{plan[:place]}旅行ですね、何人で行きますか？"
+  plan
 end
 
 def member(number_of_people)
